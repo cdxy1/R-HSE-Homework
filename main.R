@@ -1,23 +1,61 @@
-# Создадим случайные данные
-set.seed(123)
-x <- rnorm(100)  # 100 случайных значений для x
-y <- rnorm(100)  # 100 случайных значений для y
+library(ggplot2)
+library(dplyr)
+library(ggthemes)
+library(scales)
 
-# Очень плохой график
-plot(x, y, 
-     main = "Заведомо плохой график",  # Заголовок, нормальный
-     xlab = "X-ось",                   # Метка оси X
-     ylab = "Y-ось",                   # Метка оси Y
-     col = rainbow(100),               # Перегрузка цветов
-     pch = sample(1:25, 100, replace = TRUE),  # Случайные символы для точек
-     cex = runif(100, 0.1, 3),         # Случайный размер точек
-     xlim = c(-10, 10), ylim = c(-10, 10),  # Нереалистичные пределы осей
-     xaxt = "n", yaxt = "n",           # Убираем метки на осях
-     bty = "n",                        # Убираем рамку вокруг графика
-     lwd = 3                           # Толстые линии (не нужны)
-)
+generate_random_data <- function(n = 100) {
+  x <- rnorm(n, mean = 5, sd = 2)
+  y <- rnorm(n, mean = -5, sd = 3)
+  data.frame(x = x, y = y)
+}
 
-# Добавляем линии и текст, которые не нужны
-abline(h = 0, v = 0, col = "red", lwd = 2)  # Линии на нуле
-text(5, 5, "Текст не к месту", col = "blue", cex = 2)  # Текст на произвольной позиции
+generate_random_colors <- function(n = 100) {
+  colors <- sample(colors(), n, replace = TRUE)
+  return(colors)
+}
+
+generate_random_size <- function(n = 100) {
+  sizes <- runif(n, 1, 5)
+  return(sizes)
+}
+
+set_random_axes_limits <- function() {
+  xlim <- c(sample(-20:0, 1), sample(0:20, 1))
+  ylim <- c(sample(-20:0, 1), sample(0:20, 1))
+  return(list(xlim = xlim, ylim = ylim))
+}
+
+create_funny_plot <- function(n = 100) {
+  data <- generate_random_data(n)
+  colors <- generate_random_colors(n)
+  sizes <- generate_random_size(n)
+  axes_limits <- set_random_axes_limits()
+  
+  ggplot(data, aes(x = x, y = y)) +
+    geom_point(aes(color = colors, size = sizes), alpha = 0.6) +
+    scale_color_identity() +
+    scale_size_continuous(range = c(1, 15)) +
+    xlim(axes_limits$xlim) + ylim(axes_limits$ylim) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 16, color = "purple"),
+      axis.text = element_text(size = 14, color = "orange"),
+      axis.title = element_text(size = 16, color = "green")
+    ) +
+    labs(
+      title = "График с немного смешными осями",
+      x = "Невероятная X-ось",
+      y = "Потрясающая Y-ось"
+    ) +
+    theme(legend.position = "none") +
+    annotate("text", x = -15, y = 10, label = "Это не график\nЭто шедевр и он прекрасен!", size = 6, color = "red") +
+    annotate("segment", x = -10, xend = 15, y = 5, yend = 5, color = "blue", size = 2) +
+    annotate("segment", x = 0, xend = 0, y = -10, yend = 10, color = "yellow", size = 2)
+}
+
+main <- function() {
+  create_funny_plot(100)
+}
+
+main()
 
